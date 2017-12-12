@@ -7,8 +7,10 @@ stormcry twin swords = 88372
 guardian fist = 83292 for testing
 stormcry fist = 88382 for testing
 NOTE: place cdr weapon in TOP LEFT SLOT OF BAG
+NOTE: toggle command added to toggle use of pre-fight steroid skill with double brooch
 */
 
+const Command = require('command');
 const	TRIGGER_ITEM = 6560,     // minor replenishment potable
 		marrow = 51028,
 		quatreBrooches =[51011], // TODO: missing id for new patch quatre brooch
@@ -19,14 +21,21 @@ const	TRIGGER_ITEM = 6560,     // minor replenishment potable
 		JOB_WARRIOR = 0;
 
 module.exports = function broochSwap(dispatch){
+	const command = Command(dispatch);
 	let	cid,
 		job,
 		model,
 		w_enable,
+		toggle = true,
 		location,
 		secondaryBroochSlot,
 		primaryBroochSlot,
 		quickcarveID = quickcarve;
+
+	command.add('toggle', () => {
+		toggle = !toggle;
+		command.message('Brooch swap with DG ' + (toggle ? 'enabled' : 'disabled') + '.');
+	});
 
 	dispatch.hook('S_LOGIN', 1, (event) => {
 
@@ -48,26 +57,18 @@ module.exports = function broochSwap(dispatch){
 				unk: 0
 			})
 
-			if (w_enable) {
-
+			if (w_enable && toggle) {
 				dispatch.toServer('C_EQUIP_ITEM', 1, {
-
 					cid: cid,
 					slot: TEST_SLOT,
 					unk: 0
-
 				});
 
 				Gamble = setTimeout(gamble,150)
 
 			} else {
-
 				timeout = setTimeout(broochSwap,150)
-
 			}
-
-
-
 
 		}
 	})
@@ -131,24 +132,19 @@ module.exports = function broochSwap(dispatch){
 
 		clearTimeout(primary)
 		// equip main weapon and brooch here
-		if (w_enable) {
-
+		if (w_enable && toggle) {
 			dispatch.toServer('C_EQUIP_ITEM', 1, {
 				cid: cid,
 				slot: TEST_SLOT,
 				unk: 0
 			});
-
 		}
 
 		dispatch.toServer('C_EQUIP_ITEM',1, {
-
 			cid: cid,
 			slot: primaryBroochSlot,
 			unk: 0
-
 		})
-
 	}
 
 	function gamble() {
@@ -156,7 +152,6 @@ module.exports = function broochSwap(dispatch){
 		clearTimeout(Gamble)
 
 		dispatch.toServer('C_START_SKILL',1, {
-
 			skill: DEADLY_GAMBLE,
 			w: location.w,
 			x: location.x1,
@@ -169,14 +164,11 @@ module.exports = function broochSwap(dispatch){
 			moving: false,
 			continue: false,
 			target: {
-
 				low: 0,
 				high: 0,
 				unsigned: true
-
 			}
-
-	});
+		});
 
 		timeout = setTimeout(broochSwap,300)
 
