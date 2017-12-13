@@ -43,20 +43,23 @@ module.exports = function broochSwap(dispatch){
 
 	dispatch.hook('C_PLAYER_LOCATION', 1, event =>{location = event})
 
+	dispatch.hook('S_INVEN', 5, event =>{
+		if (broochSlot < 40) return;
+		for ( var i = 0; i < event.items.length; i++) {
+			if (secondaryBrooches.includes(event.items[i].item)) {
+				quickcarveID = event.items[i].item;
+				broochSlot = event.items[i].slot;
+				break;
+			}
+		}
+		// debug
+		console.log('brooch slot: ' + broochSlot);
+	})
+
 	dispatch.hook('C_USE_ITEM', 1, event =>{
 		if(event.item == TRIGGER_ITEM){
 
-			dispatch.hookOnce('S_INVEN', 5, event =>{
-				for ( var i = 0; i < event.items.length; i++) {
-					if (secondaryBrooches.includes(event.items[i].item)) {
-						quickcarveID = event.items[i].item;
-						broochSlot = event.items[i].slot;
-						break;
-					}
-				}
-				// debug
-				console.log('primary brooch slot: ' + broochSlot);
-			})
+
 
 			// equip quickcarve and CDR weapon
 			dispatch.toServer('C_EQUIP_ITEM', 1,{
@@ -72,10 +75,10 @@ module.exports = function broochSwap(dispatch){
 					unk: 0
 				});
 
-				Gamble = setTimeout(gamble,150)
+				Gamble = setTimeout(gamble,300)
 
 			} else {
-				timeout = setTimeout(broochSwap,150)
+				timeout = setTimeout(broochSwap,300)
 			}
 
 		}
