@@ -8,6 +8,7 @@ TERA-proxy module that equips your secondary brooch, uses it and equips primary 
 * TRIGGER_ITEM can be set to any consumable item of your choice (default: Minor Replenishment Potable)
 * Automatically detects if you are playing warrior, and enables the CDR weapon + deadly gamble script.
 ## Usage
+* MAKE SURE YOU HAVE YOUR MAIN SET EQUIPPED, YOUR CDR WEAPON IN THE TOP-LEFTMOST SLOT OF BAG, AND YOUR QUICKCARVE BROOCH ANYWHERE IN BAG
 * TRIGGER_ITEM is any item that can be placed on your skillbar
   * Using the TRIGGER_ITEM will trigger the brooch swap
   * You dont have to have TRIGGER_ITEM in your inventory, placing it on your skillbar is enough
