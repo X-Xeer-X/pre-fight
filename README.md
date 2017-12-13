@@ -2,8 +2,8 @@
 TERA-proxy module that equips your secondary brooch, uses it and equips primary brooch back.
 * Edited and updated by jenoveil, original source: https://github.com/spaacecats/brooch-swap
  * Added deadly gamble + cdr weap functionality to the script.
- * Brooch swap is now adaptive, and will automatically choose your best primary brooch that the character possesses. Allows use of the script for characters with different brooch setups.
- * Brooch swap now functions for RK patch brooches (obtained thru upgrading, not crafting)
+ * Allows use of the script for characters with different brooch setups.
+ * Brooch swap now functions for RK patch quickcarve brooches (obtained thru upgrading, not crafting)
 ## Settings
 * TRIGGER_ITEM can be set to any consumable item of your choice (default: Minor Replenishment Potable)
 * Automatically detects if you are playing warrior, and enables the CDR weapon + deadly gamble script.

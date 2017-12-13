@@ -12,9 +12,6 @@ NOTE: toggle command added to toggle use of pre-fight steroid skill with double 
 
 const Command = require('command');
 const	TRIGGER_ITEM = 6560,     // minor replenishment potable
-		marrow = 51028,
-		quatreBrooches =[51011], // TODO: missing id for new patch quatre brooch
-		empoweredBrooches = [19703,98405], // empowered IDs
 		secondaryBrooches = [19706,98405], // quickcarve IDs
 		TEST_SLOT = 40,
 		DEADLY_GAMBLE = 67309064,
@@ -28,9 +25,8 @@ module.exports = function broochSwap(dispatch){
 		w_enable,
 		toggle = true,
 		location,
-		secondaryBroochSlot,
-		primaryBroochSlot,
-		quickcarveID = quickcarve;
+		broochSlot,
+		quickcarveID = secondaryBrooches[0];
 
 	command.add('toggle', () => {
 		toggle = !toggle;
@@ -50,10 +46,22 @@ module.exports = function broochSwap(dispatch){
 	dispatch.hook('C_USE_ITEM', 1, event =>{
 		if(event.item == TRIGGER_ITEM){
 
+			dispatch.hookOnce('S_INVEN', 5, event =>{
+				for ( var i = 0; i < event.items.length; i++) {
+					if (secondaryBrooches.includes(event.items[i].item)) {
+						quickcarveID = event.items[i].item;
+						broochSlot = event.items[i].slot;
+						break;
+					}
+				}
+				// debug
+				console.log('primary brooch slot: ' + broochSlot);
+			})
+
 			// equip quickcarve and CDR weapon
 			dispatch.toServer('C_EQUIP_ITEM', 1,{
 				cid: cid,
-				slot: secondaryBroochSlot,
+				slot: broochSlot,
 				unk: 0
 			})
 
@@ -72,60 +80,38 @@ module.exports = function broochSwap(dispatch){
 
 		}
 	})
-	// prioritize assign marrow > quatre > empowered to primary slot
-	dispatch.hook('S_INVEN', 5, event =>{
-		var priority = 3; // 1 = marrow, 2 = quatre, 3 = empowered
-		for ( var i = 0; i < event.items.length; i++) {
-			if (event.items[i].item == marrow && priority >= 1) {
-				primaryBroochSlot = event.items[i].slot;
-				break; // end search once marrow found
-			}
-			else if (quatreBrooches.includes(event.items[i].item) && priority >= 2) {
-				primaryBroochSlot = event.items[i].slot;
-				break; // skip searching for empowered once quatre found
-			}
-			else if (empoweredBrooches.includes(event.items[i].item) && priority == 3) {
-
-				primaryBroochSlot  = event.items[i].slot;
-				break;
-			}
-		}
-		for ( var i = 0; i < event.items.length; i++) {
-
-			if (secondaryBrooches.includes(event.items[i].item)) {
-				quickcarveID = event.items[i].item;
-				secondaryBroochSlot = event.items[i].slot;
-				break;
-			}
-
-		}
-	})
 
 	function broochSwap(){
 		clearTimeout(timeout)
-		dispatch.toServer('C_USE_ITEM', 1,{
+		dispatch.toServer('C_USE_ITEM', 2,{
 			ownerId: cid,
-			item: quickcarveID,
-			id: 0,
-			unk1: 0,
-			unk2: 0,
-			unk3: 0,
-			unk4: 1,
-			unk5: 0,
-			unk6: 0,
-			unk7: 0,
+			id: quickcarveID,
+			uniqueId: {
+				low: 0,
+				high: 0,
+				unsigned: true
+			},
+			targetId: {
+				low: 0,
+				high: 0,
+				unsigned: true
+			},
+			amount: 1,
+			targetX: 0,
+			targetY: 0,
+			targetZ: 0,
 			x: location.x1,
 			y: location.y1,
 			z: location.z1,
 			w: location.w,
-			unk8: 0,
-			unk9: 0,
-			unk10: 0,
-			unk11: 1
+			unk1: 0,
+			unk2: 0,
+			unk3: 0,
+			unk4: 1
 		})
 
 		// pop deadly gamble here
-		primary = setTimeout(equipMain,150)
+		primary = setTimeout(equipMain,300)
 	}
 
 	function equipMain() {
@@ -139,10 +125,9 @@ module.exports = function broochSwap(dispatch){
 				unk: 0
 			});
 		}
-
 		dispatch.toServer('C_EQUIP_ITEM',1, {
 			cid: cid,
-			slot: primaryBroochSlot,
+			slot: broochSlot,
 			unk: 0
 		})
 	}
